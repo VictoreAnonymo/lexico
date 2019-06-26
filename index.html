@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Dictionnary</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<header>
+		<h1>English → Latino Moderno</h1>
+		<p><span id="num"></span> words and expressions</p>
+	</header>
+	<div class="wrapper">
+		<div class="words">
+			<div class="form">
+				<input type="text" id="search" placeholder="apple">
+				<button onclick="search()">Search</button>
+			</div>
+			<ul id="list">
+			</ul>
+		</div>
+		<div class="word">
+			<h2 id="en"></h3>
+			<p>→ <span id="LM"></span></p>
+
+			<hr>
+
+			<h3>Example(s)</h3>
+			<ul id="examples"></ul>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="dict.js"></script>
+<script type="text/javascript">
+	function csv_to_JSON(csv){
+		var lines = csv.split("\n");
+		var result = [];
+		var headers = lines[0].split(",");
+		for (var i = 1; i < lines.length; i++) {
+			var obj = {};
+			var currentline=lines[i].split(",");
+			for(var j = 0; j < headers.length; j++) {
+				obj[headers[j]] = currentline[j];
+			}
+			result.push(obj);
+		}
+		return JSON.stringify(result);
+	}
+
+	show = function(i) {
+		document.getElementById('en').innerHTML = dict[i].en;
+		document.getElementById('LM').innerHTML = dict[i].LM;
+
+		document.getElementById('examples').innerHTML = '';
+		if (dict[i].examples.length > 0) {
+			for (var j = 0; j < dict[i].examples.length; j++) {
+				document.getElementById('examples').innerHTML +=
+					"<li>" + dict[i].examples[j] + "</li>";
+			}
+		} else {
+			document.getElementById('examples').innerHTML = 'No example available.';
+		}
+	}
+
+	init = function(){
+		for (var i = 0; i < dict.length; i++) {
+			document.getElementById('list').innerHTML
+				+= "<li onclick='show(" + i + ")'>" + dict[i].en + "</li>";
+		}
+	}
+
+	init();
+	document.getElementById('num').innerHTML = dict.length;
+	show(Math.floor(Math.random() * dict.length));
+
+	// S E A R C H
+	search = function() {
+		query = document.getElementById('search').value;
+		if (query == "") {
+			return;
+		}
+		found = -1; // false
+		for (var i = 0; i < dict.length; i++) {
+			console.log(query);
+			if (query == dict[i].en) {
+				found = i;
+				break;
+			}
+		}
+		if (found < 0) {
+			document.getElementById('en').innerHTML = 'Unknown word';
+			document.getElementById('LM').innerHTML = '';
+			document.getElementById('examples').innerHTML = '';
+		} else {
+			show(found);
+		}
+	}
+
+	document.getElementById("search").onkeypress = function(event) {
+    	if (event.keyCode == 13 || event.which == 13){
+        	search();
+        }
+    };
+</script>
+</html>
